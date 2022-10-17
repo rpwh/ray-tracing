@@ -1,5 +1,7 @@
 mod vec3;
-use crate::vec3::Vec3;
+mod color;
+use crate::vec3::*;
+use crate::color::write_color;
 
 fn main(){
 
@@ -12,15 +14,8 @@ fn main(){
     //Render
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH {
-            let r = (i as f64) / (IMAGE_HEIGHT-1) as f64;
-            let g = (j as f64) / (IMAGE_WIDTH-1) as f64;
-            let b = 0.25;
-
-            let ir = (255.999 * r) as u32;
-            let ig = (255.999 * g) as u32;
-            let ib = (255.999 * b) as u32;
-
-            println!("{} {} {}", ir, ig, ib);
+            let pixel_color: Color = Color::new(i as f32/(IMAGE_WIDTH-1) as f32, j as f32/(IMAGE_HEIGHT-1) as f32, 0.25);
+            write_color(pixel_color);
         }
     }
 }

@@ -152,6 +152,9 @@ pub fn unit_vector(v: Vec3) -> Vec3 {
     v/v.len()
 }
 
+pub type Point3 = Vec3;
+pub type Color = Vec3;
+
 #[cfg(test)]
 mod tests {
     use crate::Vec3;
