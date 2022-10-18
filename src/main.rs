@@ -1,5 +1,6 @@
 mod vec3;
 mod color;
+mod ray;
 use crate::vec3::*;
 use crate::color::write_color;
 
