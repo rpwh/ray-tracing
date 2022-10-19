@@ -1,6 +1,8 @@
 mod vec3;
 mod color;
 mod ray;
+mod surface;
+mod sphere;
 use crate::vec3::*;
 use crate::color::write_color;
 use crate::ray::Ray;
