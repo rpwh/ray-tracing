@@ -24,7 +24,7 @@ where
         self.surface_list.clear();
     }
 
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+    pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
         let mut temp_rec: HitRecord = rec.clone();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;

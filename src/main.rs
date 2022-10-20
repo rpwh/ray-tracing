@@ -4,8 +4,14 @@ mod sphere;
 mod surface;
 mod surface_list;
 mod vec3;
+use std::rc::Rc;
+
+use surface::HitRecord;
+
 use crate::color::write_color;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
+use crate::surface_list::SurfaceList;
 use crate::vec3::*;
 
 fn main() {
@@ -13,6 +19,11 @@ fn main() {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
+
+    //World
+    let mut world = SurfaceList::new();
+    world.add(Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     //Camera
     let viewport_height = 2.0;
@@ -36,33 +47,19 @@ fn main() {
                 origin,
                 lower_left_corner + horizontal * u + vertical * v - origin,
             );
-            let pixel_color: Color = ray_color(r);
+            let pixel_color: Color = ray_color(&r, &world);
             write_color(pixel_color);
         }
     }
 }
 
-fn ray_color(r: Ray) -> Color {
-    let t = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &r);
-    if t > 0.0 {
-        let n = unit_vector(r.at(t) - Vec3::new(0.0, 0.0, -1.0));
-        return Color::new(n.x + 1.0, n.y + 1.0, n.z + 1.0) * 0.5;
+fn ray_color(r: &Ray, world: &SurfaceList<Sphere>) -> Color {
+    //Do I change below to use Option<HitRecord>?
+    let mut rec: HitRecord = HitRecord::new(Point3::new(0.0, 0.0, 0.0), Point3::new(0.0, 0.0, 0.0), 0.0, false);
+    if world.hit(r, 0.0, f32::INFINITY, &mut rec) {
+        return (rec.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
     }
     let unit_direction: Vec3 = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
-}
-
-fn hit_sphere(center: Point3, radius: f32, r: &Ray) -> f32 {
-    let oc = r.origin - center;
-    let a = r.direction.len_squared();
-    let half_b = dot(&oc, &r.direction);
-    let c = oc.len_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-
-    if discriminant < 0.0 {
-        -1.0
-    } else {
-        (-half_b - (discriminant.sqrt())) / a
-    }
 }
