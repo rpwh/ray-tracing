@@ -1,7 +1,7 @@
-use std::ops::{Neg, AddAssign, MulAssign, DivAssign, Add, Sub, Div, Mul};
 use std::fmt;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
-#[derive (Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
@@ -10,11 +10,11 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
-        Vec3 {x, y, z,}
+        Vec3 { x, y, z }
     }
 
     pub fn len(&self) -> f32 {
-       self.len_squared().sqrt()
+        self.len_squared().sqrt()
     }
 
     pub fn len_squared(&self) -> f32 {
@@ -31,7 +31,7 @@ impl fmt::Display for Vec3 {
 impl Add for Vec3 {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self::Output{
+    fn add(self, other: Self) -> Self::Output {
         Self {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -43,7 +43,7 @@ impl Add for Vec3 {
 impl Sub for Vec3 {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self::Output{
+    fn sub(self, other: Self) -> Self::Output {
         Self {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -55,7 +55,7 @@ impl Sub for Vec3 {
 impl Div for Vec3 {
     type Output = Self;
 
-    fn div(self, other: Self) -> Self::Output{
+    fn div(self, other: Self) -> Self::Output {
         Self {
             x: self.x / other.x,
             y: self.y / other.y,
@@ -79,7 +79,7 @@ impl Div<f32> for Vec3 {
 impl Mul for Vec3 {
     type Output = Self;
 
-    fn mul(self, other: Self) -> Self::Output{
+    fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
             y: self.y * other.y,
@@ -91,7 +91,7 @@ impl Mul for Vec3 {
 impl Mul<f32> for Vec3 {
     type Output = Self;
 
-    fn mul(self, other: f32) -> Self::Output{
+    fn mul(self, other: f32) -> Self::Output {
         Self {
             x: self.x * other,
             y: self.y * other,
@@ -104,7 +104,11 @@ impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self {x: -self.x, y: -self.y, z: -self.z}
+        Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
     }
 }
 
@@ -142,14 +146,16 @@ pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
     v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 }
 
-pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3{
-    Vec3::new(v1.y * v2.z - v1.z * v2.y,
-              v1.z * v2.x - v1.x * v2.z,
-              v1.x * v2.y - v1.y * v2.x)
+pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
+    Vec3::new(
+        v1.y * v2.z - v1.z * v2.y,
+        v1.z * v2.x - v1.x * v2.z,
+        v1.x * v2.y - v1.y * v2.x,
+    )
 }
 
 pub fn unit_vector(v: Vec3) -> Vec3 {
-    v/v.len()
+    v / v.len()
 }
 
 pub type Point3 = Vec3;
@@ -161,8 +167,8 @@ mod tests {
 
     #[test]
     fn neg_vec3() {
-        let v = Vec3::new(12.0,0.0,-5.0);
-        assert_eq!(-v, Vec3::new(-12.0,0.0,5.0));
+        let v = Vec3::new(12.0, 0.0, -5.0);
+        assert_eq!(-v, Vec3::new(-12.0, 0.0, 5.0));
     }
 
     #[test]
@@ -176,19 +182,19 @@ mod tests {
     fn mul_assign_vec3() {
         let mut v1 = Vec3::new(12.0, 6.12, -2.6);
         v1 *= Vec3::new(17.0, 8.72, -7.6);
-        assert_eq!(v1, Vec3::new(12.0*17.0, 6.12*8.72, -7.6*-2.6))
+        assert_eq!(v1, Vec3::new(12.0 * 17.0, 6.12 * 8.72, -7.6 * -2.6))
     }
 
     #[test]
     fn div_assign_vec3() {
         let mut v1 = Vec3::new(12.0, 6.12, -2.6);
         v1 /= Vec3::new(17.0, 8.72, -7.6);
-        assert_eq!(v1, Vec3::new(12.0/17.0, 6.12/8.72, -2.6/-7.6))
+        assert_eq!(v1, Vec3::new(12.0 / 17.0, 6.12 / 8.72, -2.6 / -7.6))
     }
 
     #[test]
     fn len_vec3() {
-        let v1 = Vec3::new(1.0,2.0,3.0);
+        let v1 = Vec3::new(1.0, 2.0, 3.0);
         assert_eq!(v1.len(), 3.7416575)
     }
 
@@ -197,7 +203,7 @@ mod tests {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(2.0, 3.0, 4.0);
         let v3 = Vec3::new(3.0, 5.0, 7.0);
-        assert_eq!(v1+v2, v3);
+        assert_eq!(v1 + v2, v3);
     }
 
     #[test]
@@ -205,29 +211,29 @@ mod tests {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(2.0, 3.0, 4.0);
         let v3 = Vec3::new(-1.0, -1.0, -1.0);
-        assert_eq!(v1-v2, v3);
+        assert_eq!(v1 - v2, v3);
     }
 
     #[test]
     fn div_vec3() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(2.0, 3.0, 4.0);
-        let v3 = Vec3::new(1.0/2.0, 2.0/3.0, 3.0/4.0);
-        assert_eq!(v1/v2, v3);
+        let v3 = Vec3::new(1.0 / 2.0, 2.0 / 3.0, 3.0 / 4.0);
+        assert_eq!(v1 / v2, v3);
     }
 
     #[test]
     fn mul_vec3() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(2.0, 3.0, 4.0);
-        let v3 = Vec3::new(1.0*2.0, 2.0*3.0, 3.0*4.0);
-        assert_eq!(v1*v2, v3);
+        let v3 = Vec3::new(1.0 * 2.0, 2.0 * 3.0, 3.0 * 4.0);
+        assert_eq!(v1 * v2, v3);
     }
 
     #[test]
     fn mul_scalar_vec3() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
-        let v2 = Vec3::new(1.0*3.0, 2.0*3.0, 3.0*3.0);
-        assert_eq!(v1*3.0, v2);
+        let v2 = Vec3::new(1.0 * 3.0, 2.0 * 3.0, 3.0 * 3.0);
+        assert_eq!(v1 * 3.0, v2);
     }
 }

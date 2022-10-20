@@ -1,6 +1,6 @@
-use crate::surface::{Surface, HitRecord};
-use crate::vec3::{Point3, dot};
 use crate::ray::Ray;
+use crate::surface::{HitRecord, Surface};
+use crate::vec3::{dot, Point3};
 
 pub struct Sphere {
     pub center: Point3,
@@ -9,7 +9,7 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(center: Point3, radius: f32) -> Sphere {
-        Sphere{center,radius,}
+        Sphere { center, radius }
     }
 }
 
@@ -18,10 +18,12 @@ impl Surface for Sphere {
         let oc = r.origin - self.center;
         let a = r.direction.len_squared();
         let half_b = dot(&oc, &r.direction);
-        let c = oc.len_squared() - self.radius*self.radius;
+        let c = oc.len_squared() - self.radius * self.radius;
 
-        let discriminant = half_b*half_b - a*c;
-        if discriminant < 0.0 {return false}
+        let discriminant = half_b * half_b - a * c;
+        if discriminant < 0.0 {
+            return false;
+        }
         let sqrtd = discriminant.sqrt();
 
         let mut root = (-half_b - sqrtd) / a;
@@ -34,7 +36,8 @@ impl Surface for Sphere {
 
         rec.t = root;
         rec.p = r.at(rec.t);
-        rec.normal = (rec.p - self.center) / self.radius;
+        let outward_normal = (rec.p - self.center) / self.radius;
+        rec.set_face_normal(r, &outward_normal);
         true
     }
 }
