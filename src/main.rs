@@ -4,10 +4,10 @@ mod sphere;
 mod surface;
 mod surface_list;
 mod vec3;
+mod camera;
+
 use std::rc::Rc;
-
 use surface::HitRecord;
-
 use crate::color::write_color;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
