@@ -13,6 +13,9 @@ use crate::sphere::Sphere;
 use crate::surface_list::SurfaceList;
 use crate::vec3::*;
 use rand::Rng;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufWriter;
 use std::rc::Rc;
 use surface::HitRecord;
 
@@ -22,6 +25,7 @@ fn main() {
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
     const SAMPLES_PER_PIXEL: u32 = 100;
+    const MAX_DEPTH: i32 = 50;
 
     let mut rng = rand::thread_rng();
 
@@ -34,23 +38,25 @@ fn main() {
     let cam = Camera::new(16.0 / 9.0, 2.0, 1.0);
 
     //Render
-    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+    let mut image_file = BufWriter::new(File::create("image.ppm").expect("Error Creating File"));
+    writeln!(image_file, "P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT).unwrap();
 
     for j in (0..IMAGE_HEIGHT).rev() {
+        println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
                 let u = (i as f32 + rng.gen_range(0.0..1.0)) / (IMAGE_WIDTH - 1) as f32;
                 let v = (j as f32 + rng.gen_range(0.0..1.0)) / (IMAGE_HEIGHT - 1) as f32;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world);
+                pixel_color += ray_color(&r, &world, MAX_DEPTH);
             }
-            write_color(pixel_color, SAMPLES_PER_PIXEL as f32);
+            write_color(&mut image_file, pixel_color, SAMPLES_PER_PIXEL as f32);
         }
     }
 }
 
-fn ray_color(r: &Ray, world: &SurfaceList<Sphere>) -> Color {
+fn ray_color(r: &Ray, world: &SurfaceList<Sphere>, depth: i32) -> Color {
     //Do I change below to use Option<HitRecord>?
     let mut rec: HitRecord = HitRecord::new(
         Point3::new(0.0, 0.0, 0.0),
@@ -58,8 +64,14 @@ fn ray_color(r: &Ray, world: &SurfaceList<Sphere>) -> Color {
         0.0,
         false,
     );
+
+    if depth <= 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
     if world.hit(r, 0.0, f32::INFINITY, &mut rec) {
-        return (rec.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+        return (ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)) * 0.5;
     }
     let unit_direction: Vec3 = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);

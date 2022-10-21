@@ -1,5 +1,6 @@
 use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
+use rand::{Rng, thread_rng};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
@@ -19,6 +20,19 @@ impl Vec3 {
 
     pub fn len_squared(&self) -> f32 {
         self.x.powi(2) + self.y.powi(2) + self.z.powi(2)
+    }
+
+    pub fn random(min: f32, max: f32) -> Vec3 {
+        let mut rng = thread_rng();
+        Vec3::new(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random(-1.0, 1.0);
+            if p.len_squared() >= 1.0 {continue;}
+            return p;
+        }
     }
 }
 
