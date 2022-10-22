@@ -58,18 +58,13 @@ fn main() {
 
 fn ray_color(r: &Ray, world: &SurfaceList<Sphere>, depth: i32) -> Color {
     //Do I change below to use Option<HitRecord>?
-    let mut rec: HitRecord = HitRecord::new(
-        Point3::new(0.0, 0.0, 0.0),
-        Point3::new(0.0, 0.0, 0.0),
-        0.0,
-        false,
-    );
+    let mut rec = HitRecord::default();
 
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    if world.hit(r, 0.0, f32::INFINITY, &mut rec) {
+    if world.hit(r, 0.001, f32::INFINITY, &mut rec) {
         let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
         return (ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)) * 0.5;
     }

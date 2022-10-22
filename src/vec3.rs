@@ -2,7 +2,7 @@ use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 use rand::{Rng, thread_rng};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Default,Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,

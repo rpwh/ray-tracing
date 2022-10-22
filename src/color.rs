@@ -9,9 +9,9 @@ pub fn write_color(file: &mut BufWriter<File>, pixel_color: Color, samples: f32)
     let mut b = pixel_color.z;
 
     let scale = 1.0 / samples;
-    r = f32::sqrt(scale * r);
-    g = f32::sqrt(scale * g);
-    b = f32::sqrt(scale * b);
+    r = (scale * r).sqrt();
+    g = (scale * g).sqrt();
+    b = (scale * b).sqrt();
 
 
     writeln!(
