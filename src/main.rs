@@ -20,6 +20,7 @@ use std::io::prelude::*;
 use std::io::BufWriter;
 use std::rc::Rc;
 use surface::HitRecord;
+use pbr::ProgressBar;
 
 fn main() {
     //Image
@@ -51,8 +52,10 @@ fn main() {
     let mut image_file = BufWriter::new(File::create("image.ppm").expect("Error Creating File"));
     writeln!(image_file, "P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT).unwrap();
 
+    let mut pb = ProgressBar::new(IMAGE_HEIGHT as u64);
+    pb.format("╢▌▌░╟");
+
     for j in (0..IMAGE_HEIGHT).rev() {
-        println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
@@ -63,6 +66,7 @@ fn main() {
             }
             write_color(&mut image_file, pixel_color, SAMPLES_PER_PIXEL as f32);
         }
+        pb.inc();
     }
 }
 
