@@ -5,9 +5,11 @@ mod sphere;
 mod surface;
 mod surface_list;
 mod vec3;
+mod material;
 
 use crate::camera::Camera;
 use crate::color::write_color;
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::surface_list::SurfaceList;
@@ -25,14 +27,22 @@ fn main() {
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
     const SAMPLES_PER_PIXEL: u32 = 100;
-    const MAX_DEPTH: i32 = 50;
+    const MAX_DEPTH: i32 = 200;
 
     let mut rng = rand::thread_rng();
 
     //World
     let mut world = SurfaceList::new();
-    world.add(Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Material::Lambertian { albedo: Vec3::new(0.8, 0.8, 0.0) };
+    let material_center = Material::Dielectric { ir: 1.5 };
+    let material_left = Material::Dielectric { ir: 1.5 };
+    let material_right = Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 1.0 };
+
+    world.add(Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, material_ground)));
+    world.add(Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, material_center)));
+    world.add(Rc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left)));
+    world.add(Rc::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, material_right)));
 
     //Camera
     let cam = Camera::new(16.0 / 9.0, 2.0, 1.0);
@@ -65,8 +75,11 @@ fn ray_color(r: &Ray, world: &SurfaceList<Sphere>, depth: i32) -> Color {
     }
 
     if world.hit(r, 0.001, f32::INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
-        return (ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)) * 0.5;
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+        if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
+            return attenuation * ray_color(&scattered, world, depth-1 )
+        }
     }
     let unit_direction: Vec3 = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);

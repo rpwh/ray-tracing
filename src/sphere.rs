@@ -1,3 +1,4 @@
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::surface::{HitRecord, Surface};
 use crate::vec3::{dot, Point3};
@@ -5,11 +6,16 @@ use crate::vec3::{dot, Point3};
 pub struct Sphere {
     pub center: Point3,
     pub radius: f32,
+    pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f32) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f32, material: Material) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -38,6 +44,7 @@ impl Surface for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
+        rec.mat = self.material.clone();
         true
     }
 }

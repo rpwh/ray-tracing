@@ -34,6 +34,35 @@ impl Vec3 {
             return p;
         }
     }
+
+    pub fn random_unit_vector() -> Vec3 {
+        unit_vector(Vec3::random_in_unit_sphere())
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+        let in_unit_sphere = Vec3::random_in_unit_sphere();
+        if dot(&in_unit_sphere, normal) > 0.0 {
+            in_unit_sphere
+        }else{
+            -in_unit_sphere
+        }
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
+    }
+
+    pub fn dot(&self, other: &Vec3) -> f32 {
+        self.x * other.x + self.y * other.y + self.z * self.z
+    }
+
+    pub fn refract(&self, n: &Vec3, etai_over_etat: f32) -> Vec3 {
+        let cos_theta = (-self).dot(n);
+        let r_out_perp = (self + &(n * cos_theta)) * etai_over_etat;
+        let r_out_paralell = n * -(((1.0 - r_out_perp.len_squared()).abs()).sqrt());
+        r_out_perp + r_out_paralell
+    }
 }
 
 impl fmt::Display for Vec3 {
@@ -47,6 +76,18 @@ impl Add for Vec3 {
 
     fn add(self, other: Self) -> Self::Output {
         Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl Add for &Vec3 {
+    type Output = Vec3;
+
+    fn add(self, other: Self) -> Vec3 {
+        Vec3 {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
@@ -105,8 +146,20 @@ impl Mul for Vec3 {
 impl Mul<f32> for Vec3 {
     type Output = Self;
 
-    fn mul(self, other: f32) -> Self::Output {
-        Self {
+    fn mul(self, other: f32) -> Self {
+        Vec3 {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+        }
+    }
+}
+
+impl Mul<f32> for &Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, other: f32) -> Vec3 {
+        Vec3 {
             x: self.x * other,
             y: self.y * other,
             z: self.z * other,
@@ -119,6 +172,18 @@ impl Neg for Vec3 {
 
     fn neg(self) -> Self::Output {
         Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Neg for &Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        Vec3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -166,6 +231,10 @@ pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
         v1.z * v2.x - v1.x * v2.z,
         v1.x * v2.y - v1.y * v2.x,
     )
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    *v - *n*dot(v, n)*2.0
 }
 
 pub fn unit_vector(v: Vec3) -> Vec3 {
