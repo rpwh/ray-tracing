@@ -84,6 +84,7 @@ fn ray_color(r: &Ray, world: &SurfaceList<Sphere>, depth: i32) -> Color {
         if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
             return attenuation * ray_color(&scattered, world, depth-1 )
         }
+        return Color::new(0.0, 0.0, 0.0);
     }
     let unit_direction: Vec3 = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);
