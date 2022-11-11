@@ -54,7 +54,7 @@ impl Vec3 {
     }
 
     pub fn dot(&self, other: &Vec3) -> f32 {
-        self.x * other.x + self.y * other.y + self.z * self.z
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     pub fn refract(&self, n: &Vec3, etai_over_etat: f32) -> Vec3 {
